@@ -1,0 +1,20 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  background: #f4f4f4;
+}
+#tributeArea {
+  display: flex;
+  flex-wrap: wrap;
+}
+.tribute {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #aaa;
+  background: white;
+  width: 100px;
+}
+.dead {
+  background: #f88;
+  text-decoration: line-through;
+}

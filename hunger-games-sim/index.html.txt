@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hunger Games Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Hunger Games Simulator</h1>
+  <button onclick="startSimulation()">Start Game</button>
+  <button onclick="passDay()">Pass Day</button>
+  <p id="dayDisplay">Day: 0</p>
+  <div id="tributeArea"></div>
+  <div id="logs"></div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

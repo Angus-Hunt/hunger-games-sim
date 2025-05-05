@@ -1,0 +1,97 @@
+// Import Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Your Firebase config here
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Globals
+let tributes = [];
+let day = 0;
+const MAX_DAYS = 3;
+
+// Generate tributes
+function generateTributes() {
+  tributes = [];
+  for (let i = 1; i <= 12; i++) {
+    tributes.push({ id: i, alive: true, health: 100 });
+  }
+}
+
+// Render
+function render() {
+  document.getElementById('dayDisplay').innerText = `Day: ${day}`;
+  const area = document.getElementById('tributeArea');
+  area.innerHTML = '';
+  tributes.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'tribute' + (t.alive ? '' : ' dead');
+    div.innerText = `Tribute ${t.id}\nHP: ${t.health}`;
+    area.appendChild(div);
+  });
+}
+
+// Simulate a day
+function simulateDay() {
+  const logs = document.getElementById('logs');
+  let dailyLog = `--- Day ${day} ---<br>`;
+  tributes.forEach(t => {
+    if (t.alive && Math.random() < 0.3) {
+      t.health -= Math.floor(Math.random() * 40) + 10;
+      if (t.health <= 0) {
+        t.alive = false;
+        t.health = 0;
+        dailyLog += `Tribute ${t.id} has died.<br>`;
+      } else {
+        dailyLog += `Tribute ${t.id} took damage.<br>`;
+      }
+    }
+  });
+  logs.innerHTML += dailyLog;
+}
+
+// Save to Firebase
+async function saveState() {
+  await setDoc(doc(db, "game", "current"), {
+    tributes,
+    day
+  });
+}
+
+// Load from Firebase
+async function loadState() {
+  const docSnap = await getDoc(doc(db, "game", "current"));
+  if (docSnap.exists()) {
+    tributes = docSnap.data().tributes;
+    day = docSnap.data().day;
+    render();
+  } else {
+    generateTributes();
+    day = 0;
+    render();
+    await saveState();
+  }
+}
+
+// Public buttons
+window.startSimulation = async () => {
+  await loadState();
+};
+
+window.passDay = async () => {
+  if (day >= MAX_DAYS) return;
+  day++;
+  simulateDay();
+  render();
+  await saveState();
+};
